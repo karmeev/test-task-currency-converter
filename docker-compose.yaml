@@ -14,21 +14,7 @@ services:
     networks:
       - currency_network
         
-  redis:
-    image: redis:latest
-    container_name: currency-converter-redis
-    restart: always
-    volumes:
-      - redis_data:/data
-    ports:
-      - "6390:6379"
-    networks:
-      - currency_network
-        
 networks:
   currency_network:
     name: currency_network
-    external: false
-
-volumes:
-  redis_data:
+    external: true

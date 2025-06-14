@@ -9,16 +9,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Bogus" Version="35.6.3"/>
-        <PackageReference Include="coverlet.collector" Version="6.0.2"/>
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0"/>
-        <PackageReference Include="Moq" Version="4.20.72"/>
-        <PackageReference Include="NUnit" Version="4.2.2"/>
-        <PackageReference Include="NUnit.Analyzers" Version="4.4.0"/>
-        <PackageReference Include="NUnit3TestAdapter" Version="4.6.0"/>
-    </ItemGroup>
-
-    <ItemGroup>
         <Using Include="NUnit.Framework"/>
     </ItemGroup>
 
@@ -30,6 +20,7 @@
         <ProjectReference Include="..\..\..\Currency.Data.Contracts\Currency.Data.Contracts.csproj"/>
         <ProjectReference Include="..\..\..\Currency.Infrastructure.Contracts\Currency.Infrastructure.Contracts.csproj"/>
         <ProjectReference Include="..\..\..\Currency.Services\Currency.Services.csproj"/>
+        <ProjectReference Include="..\Currency.UnitTests\Currency.UnitTests.csproj" />
     </ItemGroup>
 
 </Project>

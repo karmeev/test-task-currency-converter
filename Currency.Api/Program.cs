@@ -19,9 +19,10 @@ builder.Services.AddVersioning();
 builder.Services.AddRateLimiter(settings);
 builder.Services.AddIdentity(settings);
 builder.Services.AddCustomBehavior();
-builder.Services.AddThirdParty(settings);
+builder.Services.AddThirdPartyApis(settings);
 builder.Services.AddHostedService<ConsumersStartupBackgroundService>();
 builder.Services.AddTransient<ExceptionHandler>();
+builder.Host.AddLogger(builder.Services, builder.Environment.EnvironmentName);
 
 builder.Host.ConfigureContainer<ContainerBuilder>(container =>
 {
@@ -34,4 +35,5 @@ app.UseCustomExceptionHandler();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.UseRequestLogging();
 app.Run();

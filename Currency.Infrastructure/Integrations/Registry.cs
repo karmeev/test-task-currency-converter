@@ -4,6 +4,7 @@ using Currency.Infrastructure.Contracts.Integrations;
 using Currency.Infrastructure.Integrations.Providers;
 using Currency.Infrastructure.Integrations.Providers.Frankfurter;
 using Currency.Infrastructure.Settings;
+using Microsoft.Extensions.Logging;
 
 namespace Currency.Infrastructure.Integrations;
 
@@ -21,8 +22,10 @@ internal static class Registry
 
                 client.BaseAddress = settings.BaseAddressUri;
                 client.Timeout = TimeSpan.FromSeconds(settings.TimeoutSeconds);
+                
+                var logger = ctx.Resolve<ILogger<FrankfurterClient>>();
 
-                return new FrankfurterClient(client);
+                return new FrankfurterClient(client, logger);
             })
             .As<IFrankfurterClient>()
             .InstancePerLifetimeScope();

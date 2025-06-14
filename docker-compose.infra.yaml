@@ -1,0 +1,59 @@
+name: currency-converter-infra
+services:
+  redis:
+    image: redis:latest
+    container_name: currency-converter-redis
+    restart: always
+    volumes:
+      - currency_redis_data:/data
+    ports:
+      - "6390:6379"
+    networks:
+      - currency_network
+  
+  elasticsearch:
+    image: elasticsearch:9.0.2
+    container_name: currency-converter-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - currency_elasticsearch_volume:/usr/share/elasticsearch/data
+    networks:
+      - currency_network
+  
+  kibana:
+    image: kibana:9.0.2
+    container_name: currency-converter-kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+    networks:
+      - currency_network
+        
+  jaeger:
+    image: jaegertracing/all-in-one:1.48
+    container_name: currency-converter-jaeger
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    ports:
+      - "16686:16686"   # Jaeger UI
+      - "4317:4317"     # OTLP gRPC receiver
+      - "4318:4318"     # OTLP HTTP receiver
+    networks:
+      - currency_network
+
+networks:
+  currency_network:
+    name: currency_network
+    external: true
+
+volumes:
+  currency_redis_data:
+  currency_elasticsearch_volume:

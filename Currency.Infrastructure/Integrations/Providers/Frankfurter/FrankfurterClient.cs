@@ -1,4 +1,6 @@
+using System.Diagnostics;
 using Currency.Infrastructure.Integrations.Providers.Frankfurter.Responses;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace Currency.Infrastructure.Integrations.Providers.Frankfurter;
@@ -14,19 +16,26 @@ internal interface IFrankfurterClient : IDisposable
         CancellationToken token = default);
 }
 
-internal class FrankfurterClient(HttpClient client) : IFrankfurterClient
+internal class FrankfurterClient(
+    HttpClient client, 
+    ILogger<FrankfurterClient> logger) : IFrankfurterClient
 {
     public async Task<GetLatestExchangeRateResponse> GetLatestExchangeRateAsync(string currency,
         CancellationToken token = default)
     {
         token.ThrowIfCancellationRequested();
-        var builder = new UriBuilder(client.BaseAddress!)
+        var uri = new UriBuilder(client.BaseAddress!)
         {
             Path = "/v1/latest",
             Query = $"base={currency}"
-        };
+        }.Uri;
 
-        var response = await client.GetAsync(builder.Uri, token);
+        WithTelemetry(uri);
+        logger.LogInformation("Requesting latest exchange rate from Frankfurter. Base: {Currency}, URI: {Uri}", 
+            currency, uri);
+
+        var response = await WithStopwatchAsync(async () => await client.GetAsync(uri, token));
+        
         response.EnsureSuccessStatusCode();
 
         return await ReadAndDeserializeAsync<GetLatestExchangeRateResponse>(response.Content, token);
@@ -36,13 +45,17 @@ internal class FrankfurterClient(HttpClient client) : IFrankfurterClient
         CancellationToken token = default)
     {
         token.ThrowIfCancellationRequested();
-        var builder = new UriBuilder(client.BaseAddress!)
+        var uri = new UriBuilder(client.BaseAddress!)
         {
             Path = "/v1/latest",
             Query = $"base={from}&symbols={SymbolsToQuery(symbols)}"
-        };
-
-        var response = await client.GetAsync(builder.Uri, token);
+        }.Uri;
+        
+        WithTelemetry(uri);
+        logger.LogInformation("Requesting latest exchange rates from Frankfurter. URI: {Uri}, " +
+                              "from: {from}, symbols: {Symbols}", uri.ToString(), from, symbols);
+        
+        var response = await WithStopwatchAsync(async () => await client.GetAsync(uri, token));
         response.EnsureSuccessStatusCode();
 
         return await ReadAndDeserializeAsync<GetLatestExchangeRatesResponse>(response.Content, token);
@@ -52,23 +65,22 @@ internal class FrankfurterClient(HttpClient client) : IFrankfurterClient
         DateOnly end, CancellationToken token = default)
     {
         token.ThrowIfCancellationRequested();
-        var builder = new UriBuilder(client.BaseAddress!)
+        var uri = new UriBuilder(client.BaseAddress!)
         {
             Path = $"/v1/{start:yyyy-MM-dd}..{end:yyyy-MM-dd}",
             Query = $"base={currency}"
-        };
-
-        var response = await client.GetAsync(builder.Uri, token);
+        }.Uri;
+        
+        WithTelemetry(uri);
+        logger.LogInformation("Requesting exchange rates history from Frankfurter. Base: {Currency}, URI: {Uri}, " +
+                              "start: {start:yyyy-MM-dd}, end: {end:yyyy-MM-dd}", currency, start, end, uri);
+        
+        var response = await WithStopwatchAsync(async () => await client.GetAsync(uri, token));
         response.EnsureSuccessStatusCode();
 
         return await ReadAndDeserializeAsync<GetExchangeRatesHistoryResponse>(response.Content, token);
     }
-
-    public void Dispose()
-    {
-        client.Dispose();
-    }
-
+    
     private static string SymbolsToQuery(ReadOnlySpan<string> currencies)
     {
         if (currencies.Length == 1) return currencies[0];
@@ -84,5 +96,41 @@ internal class FrankfurterClient(HttpClient client) : IFrankfurterClient
             throw new InvalidOperationException("Deserialization resulted in null.");
 
         return result;
+    }
+
+    private static void WithTelemetry(Uri uri)
+    {
+        Activity.Current?.SetTag("frankfurter.uri", uri.ToString());
+    }
+    
+    private async Task<HttpResponseMessage> WithStopwatchAsync(Func<Task<HttpResponseMessage>> action)
+    {
+        try
+        {
+            var stopwatch = Stopwatch.StartNew();
+            var response = await action();
+            stopwatch.Stop();
+
+            var traceId = Activity.Current?.TraceId.ToString() ?? "N/A";
+            logger.LogInformation("TraceId: {TraceId}; Frankfurter responded with status {StatusCode} in {ElapsedMilliseconds}ms",
+                traceId, response.StatusCode, stopwatch.ElapsedMilliseconds);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                logger.LogWarning("Frankfurter request failed with status code {StatusCode}", response.StatusCode);
+            }
+
+            return response;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError("Frankfurter request failed! Exception: {Exception}", ex);
+            throw;
+        }
+    }
+    
+    public void Dispose()
+    {
+        client.Dispose();
     }
 }

@@ -34,7 +34,7 @@ public class FrankfurterClientTests
             }
         };
         
-        services.AddThirdParty(settings);
+        services.AddThirdPartyApis(settings);
         services.AddOptions();
         services.AddHttpClient();
         var provider = services.BuildServiceProvider();
@@ -58,7 +58,7 @@ public class FrankfurterClientTests
     public async Task GetLatestExchangeRateAsync_HappyPath_ReturnsLatestUsdRates()
     {
         //Arrange
-        var sut = new FrankfurterClient(_client);
+        var sut = new FrankfurterClient(_client, null);
 
         //Act
         var result = await sut.GetLatestExchangeRateAsync("USD", CancellationToken.None);
@@ -77,7 +77,7 @@ public class FrankfurterClientTests
     {
         //Arrange
         _client.BaseAddress = new Uri(WireMockAddress);
-        var sut = new FrankfurterClient(_client);
+        var sut = new FrankfurterClient(_client, null);
 
         //Act
         var result = await sut.GetLatestExchangeRateAsync("USD", CancellationToken.None);
@@ -96,7 +96,7 @@ public class FrankfurterClientTests
     {
         //Arrange
         _client.BaseAddress = new Uri(WireMockAddress);
-        var sut = new FrankfurterClient(_client);
+        var sut = new FrankfurterClient(_client, null);
 
         // Act
         for (var i = 0; i < 10; i++)
@@ -119,7 +119,7 @@ public class FrankfurterClientTests
     public async Task GetExchangeRatesHistoryAsync_HappyPath_ReturnsHistory()
     {
         //Arrange
-        var sut = new FrankfurterClient(_client);
+        var sut = new FrankfurterClient(_client, null);
         var startDate = DateOnly.FromDateTime(DateTime.UtcNow.Date.AddDays(-1));
         var endDate = DateOnly.FromDateTime(DateTime.UtcNow.Date);
 
@@ -143,7 +143,7 @@ public class FrankfurterClientTests
     public async Task GetLatestExchangeRatesAsync_HappyPath_ReturnsRates()
     {
         //Arrange
-        var sut = new FrankfurterClient(_client);
+        var sut = new FrankfurterClient(_client, null);
 
         //Act
         var result = await sut.GetLatestExchangeRatesAsync("EUR", ["USD"], CancellationToken.None);
