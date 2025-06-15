@@ -36,6 +36,20 @@ test:
 			--filter "Category=$(CATEGORY)"; \
 	done
 
+coverage:
+	dotnet test \
+		--no-build \
+		--configuration Release \
+		--collect:"XPlat Code Coverage" \
+		--results-directory ./TestResults \
+		--logger "trx;LogFileName=test-results.trx"
+
+	reportgenerator \
+		-reports:./TestResults/**/coverage.cobertura.xml \
+		-targetdir:./TestResults/CoverageReport \
+		-reporttypes:MarkdownSummaryGithub
+
+
 integration_tests:
 	dotnet test ${INTEGRATION_TESTS}/Currency.IntegrationTests.Infrastructure/Currency.IntegrationTests.Infrastructure.csproj \
 				--configuration Release \

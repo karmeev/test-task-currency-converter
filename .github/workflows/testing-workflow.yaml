@@ -25,24 +25,25 @@ jobs:
         working-directory: ./src
         run: dotnet restore
 
-      - name: Run unit tests via Makefile
-        run: make test CATEGORY=Unit
-        
       - name: Install ReportGenerator
         run: dotnet tool install -g dotnet-reportgenerator-globaltool
 
-      - name: Generate coverage report
-        run: |
-          reportgenerator \
-            -reports:"tests/**/TestResults/**/coverage.cobertura.xml" \
-            -targetdir:"CoverageReport" \
-            -reporttypes:HtmlInline_AzurePipelines
+      - name: Add .NET tools to PATH
+        run: echo "${HOME}/.dotnet/tools" >> $GITHUB_PATH
 
-      - name: Upload coverage report as artifact
+      - name: Run unit tests with coverage via Makefile
+        run: make coverage
+
+      - name: Append coverage summary to GitHub
+        if: always()
+        run: cat ./TestResults/CoverageReport/SummaryGithub.md >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload full coverage report as artifact
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
-          path: CoverageReport
+          path: ./TestResults/CoverageReport
         
   integration-tests:
     runs-on: ubuntu-latest
