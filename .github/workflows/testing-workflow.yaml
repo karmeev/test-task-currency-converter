@@ -28,6 +28,22 @@ jobs:
       - name: Run unit tests via Makefile
         run: make test CATEGORY=Unit
         
+      - name: Install ReportGenerator
+        run: dotnet tool install -g dotnet-reportgenerator-globaltool
+
+      - name: Generate coverage report
+        run: |
+          reportgenerator \
+            -reports:"tests/**/TestResults/**/coverage.cobertura.xml" \
+            -targetdir:"CoverageReport" \
+            -reporttypes:HtmlInline_AzurePipelines
+
+      - name: Upload coverage report as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: CoverageReport
+        
   integration-tests:
     runs-on: ubuntu-latest
     steps:
