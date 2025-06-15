@@ -6,7 +6,7 @@ load_tests_in_compose:
 	docker compose -f ./tests/load/docker-compose.yaml up --build -d redis
 	docker compose -f ./tests/load/docker-compose.yaml up --build --exit-code-from redis-init redis-init
 	docker compose -f ./tests/load/docker-compose.yaml up --build -d api
-	@echo "Waiting 60 seconds for API to fully start..."
-	sleep 60
+	@echo "Waiting 120 seconds for API to fully start..."
+	sleep 120
 	@echo "Start K6..."
 	docker compose -f ./tests/load/docker-compose.yaml up --build --abort-on-container-exit k6
