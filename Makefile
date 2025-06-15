@@ -5,5 +5,6 @@ local_infra:
 load_tests_in_compose:
 	docker compose -f ./tests/load/docker-compose.yaml up --build -d redis
 	docker compose -f ./tests/load/docker-compose.yaml up --build --exit-code-from redis-init redis-init
-	docker compose -f ./tests/load/docker-compose.yaml up --build --abort-on-container-exit api k6
+	docker compose -f ./tests/load/docker-compose.yaml up --build api
 	docker exec -it load-tests-api-1 curl -v http://localhost:8080/api/v2/status/ping
+	docker compose -f ./tests/load/docker-compose.yaml up --build --abort-on-container-exit k6

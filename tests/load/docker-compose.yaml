@@ -43,18 +43,9 @@ services:
     depends_on:
       redis:
         condition: service_healthy
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8080/api/v2/status/ping" ]
-      interval: 5s
-      timeout: 3s
-      retries: 10
-      start_period: 15s
 
   k6:
     image: grafana/k6:latest
-    depends_on:
-      api:
-        condition: service_healthy
     volumes:
       - ./scripts:/k6-tests
     command: run /k6-tests/load-test.js
