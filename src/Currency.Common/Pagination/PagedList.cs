@@ -17,7 +17,7 @@ public class PagedList<T>
     
     public static PagedList<T> Create(IEnumerable<T> source, int pageNumber, int pageSize)
     {
-        var count = source.Count(); //counter will be injected from constructor
+        var count = source.Count();
         return new PagedList<T>(source.ToList(), count, pageNumber, pageSize);
     }
     

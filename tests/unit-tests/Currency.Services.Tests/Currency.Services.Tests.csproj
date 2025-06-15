@@ -13,10 +13,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Domain\"/>
-    </ItemGroup>
-
-    <ItemGroup>
       <PackageReference Include="Bogus" Version="35.6.3" />
       <PackageReference Include="coverlet.collector" Version="6.0.4">
         <PrivateAssets>all</PrivateAssets>

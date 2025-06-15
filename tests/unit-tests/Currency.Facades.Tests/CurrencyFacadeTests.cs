@@ -8,8 +8,6 @@ using Currency.Services.Contracts.Application;
 using Currency.Services.Contracts.Domain;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Serilog;
-using Serilog.Extensions.Logging;
 
 namespace Currency.Facades.Tests;
 
@@ -33,7 +31,7 @@ public class CurrencyFacadeTests
         Test.StartTest();
         
         // Arrange
-        var currency = _faker.Finance.Currency().Code;
+        var currency = "EUR";
         var expectedRates = new ExchangeRates
         {
             CurrentCurrency = currency,
