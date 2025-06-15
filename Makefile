@@ -50,7 +50,7 @@ coverage:
 		-reports:./TestResults/**/coverage.cobertura.xml \
 		-targetdir:./TestResults/CoverageReport \
 		-reporttypes:MarkdownSummaryGithub
-		-assemblyfilters:+*Tests;-xunit*;-System.*;-Microsoft.*;-*.Contracts
+		-assemblyfilters:+Currency.*;-*.Contracts;-*Tests;-xunit*;-System.*;-Microsoft.*
 
 integration_tests:
 	dotnet test ${INTEGRATION_TESTS}/Currency.IntegrationTests.Infrastructure/Currency.IntegrationTests.Infrastructure.csproj \
