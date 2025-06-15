@@ -32,7 +32,6 @@ test:
 			--configuration Release \
 			--no-restore \
 			--logger "console;verbosity=detailed" \
-			--collect:"XPlat Code Coverage" \
 			--filter "Category=$(CATEGORY)"; \
 	done
 

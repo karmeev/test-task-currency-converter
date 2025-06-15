@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 
 namespace Currency.Data.Repositories;
 
-public class ExchangeRatesHistoryRepository(
+internal class ExchangeRatesHistoryRepository(
     ILogger<ExchangeRatesHistoryRepository> logger,
     DataSettings settings,
     IRedisContext context): IExchangeRatesHistoryRepository
