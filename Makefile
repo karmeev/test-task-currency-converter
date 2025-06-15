@@ -58,7 +58,7 @@ integration_tests:
                 --logger "console;verbosity=detailed"
 		
 wiremock_up:
-	docker-compose -f ${INTEGRATION_TESTS}/Currency.IntegrationTests.Infrastructure/docker-compose.yaml up -d
+	docker compose -f ${INTEGRATION_TESTS}/Currency.IntegrationTests.Infrastructure/docker-compose.yaml up -d
 	@echo "Waiting for WireMock to be ready..."
 	@for i in $$(seq 1 30); do \
 		curl -s http://localhost:8080/__admin && echo "WireMock ready!" && exit 0 || \
