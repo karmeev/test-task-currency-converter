@@ -40,7 +40,6 @@ coverage:
 	@for proj in $(UNIT_TEST_PROJECTS); do \
 		echo "Running coverage for $$proj..."; \
 		dotnet test $(UNIT_TESTS)/$$proj \
-			--no-build \
 			--configuration Release \
 			--collect:"XPlat Code Coverage" \
 			--results-directory ./TestResults \
@@ -51,8 +50,6 @@ coverage:
 		-reports:./TestResults/**/coverage.cobertura.xml \
 		-targetdir:./TestResults/CoverageReport \
 		-reporttypes:MarkdownSummaryGithub
-
-
 
 integration_tests:
 	dotnet test ${INTEGRATION_TESTS}/Currency.IntegrationTests.Infrastructure/Currency.IntegrationTests.Infrastructure.csproj \
