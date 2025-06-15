@@ -16,18 +16,22 @@ unit_tests:
 				--configuration Release \
                 --no-restore \
                 --logger "console;verbosity=detailed"
+                
 	dotnet test ./tests/unit-tests/Currency.Data.Tests/Currency.Data.Tests.csproj \
         		--configuration Release \
         		--no-restore \
         		--logger "console;verbosity=detailed"
+        		
 	dotnet test ./tests/unit-tests/Currency.Facades.Tests/Currency.Facades.Tests.csproj \
         		--configuration Release \
         		--no-restore \
         		--logger "console;verbosity=detailed"
+        		
 	dotnet test ./tests/unit-tests/Currency.Infrastructure.Tests/Currency.Infrastructure.Tests.csproj \
         		--configuration Release \
         		--no-restore \
         		--logger "console;verbosity=detailed"
+        		
 	dotnet test ./tests/unit-tests/Currency.Services.Tests/Currency.Services.Tests.csproj \
         		--configuration Release \
         		--no-restore \
