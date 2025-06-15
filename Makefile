@@ -3,4 +3,6 @@ local_infra:
 	docker compose -f docker-compose.infra.yaml up -d
 
 load_tests_in_compose:
-	docker compose -f ./tests/load/docker-compose.yaml up --build --abort-on-container-exit
+	docker compose -f ./tests/load/docker-compose.yaml up --build -d redis
+	docker compose -f ./tests/load/docker-compose.yaml up --build --exit-code-from redis-init redis-init
+	docker compose -f ./tests/load/docker-compose.yaml up --build --abort-on-container-exit api k6
