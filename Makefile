@@ -37,17 +37,21 @@ test:
 	done
 
 coverage:
-	dotnet test \
-		--no-build \
-		--configuration Release \
-		--collect:"XPlat Code Coverage" \
-		--results-directory ./TestResults \
-		--logger "trx;LogFileName=test-results.trx"
+	@for proj in $(UNIT_TEST_PROJECTS); do \
+		echo "Running coverage for $$proj..."; \
+		dotnet test $(UNIT_TESTS)/$$proj \
+			--no-build \
+			--configuration Release \
+			--collect:"XPlat Code Coverage" \
+			--results-directory ./TestResults \
+			--logger "trx;LogFileName=test-results.trx"; \
+	done
 
 	reportgenerator \
 		-reports:./TestResults/**/coverage.cobertura.xml \
 		-targetdir:./TestResults/CoverageReport \
 		-reporttypes:MarkdownSummaryGithub
+
 
 
 integration_tests:
