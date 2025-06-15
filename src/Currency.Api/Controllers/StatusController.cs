@@ -21,10 +21,4 @@ public class StatusController : ControllerBase
             Status = "Healthy"
         });
     }
-    
-    [HttpGet("ping")]
-    public IActionResult Ping()
-    {
-        return Ok();
-    }
 }
