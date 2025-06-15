@@ -1,5 +1,34 @@
 name: load-tests
 services:
+  redis:
+    image: redis:latest
+    restart: always
+    ports:
+      - "6390:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 3s
+      retries: 5
+
+  redis-init:
+    image: redis:7
+    depends_on:
+      redis:
+        condition: service_healthy
+    entrypoint: /bin/sh
+    restart: "no"
+    command:
+      - -c
+      - |
+        until redis-cli -h redis ping; do
+          echo 'Waiting for Redis...';
+          sleep 1;
+        done;
+        redis-cli -h redis < /data/init-redis.redis
+    volumes:
+      - ../../resources/scripts/init-redis.redis:/data/init-redis.redis
+
   api:
     build:
       context: ../../src
@@ -11,6 +40,9 @@ services:
       - ./appsettings.Stage.json:/app/appsettings.json
     environment:
       - ASPNETCORE_URLS=http://0.0.0.0:8080
+    depends_on:
+      redis:
+        condition: service_healthy
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8080/api/v2/status/ping" ]
       interval: 5s
@@ -26,26 +58,3 @@ services:
     volumes:
       - ./scripts:/k6-tests
     command: run /k6-tests/load-test.js
-    
-  redis:
-    image: redis:latest
-    restart: always
-    ports:
-      - "6390:6379"
-
-  redis-init:
-    image: redis:7
-    depends_on:
-      - redis
-    entrypoint: /bin/sh
-    restart: "no"
-    command:
-      - -c
-      - |
-        until redis-cli -h redis ping; do
-          echo 'Waiting for Redis...';
-          sleep 1;
-        done;
-        redis-cli -h redis < /data/init-redis.redis
-    volumes:
-      - ../../resources/scripts/init-redis.redis:/data/init-redis.redis
