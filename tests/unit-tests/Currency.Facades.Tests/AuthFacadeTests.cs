@@ -13,7 +13,7 @@ using ValidationResult = Currency.Facades.Validators.Results.ValidationResult;
 namespace Currency.Facades.Tests;
 
 [TestFixture]
-[Category("Unit tests")]
+[Category("Unit")]
 public class AuthFacadeTests
 {
     private ILogger<AuthFacade> _logger;

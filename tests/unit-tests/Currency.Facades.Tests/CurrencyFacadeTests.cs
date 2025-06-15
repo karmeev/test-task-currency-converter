@@ -14,7 +14,7 @@ using Serilog.Extensions.Logging;
 namespace Currency.Facades.Tests;
 
 [TestFixture]
-[Category("Unit tests")]
+[Category("Unit")]
 public class CurrencyFacadeTests
 {
     private Faker _faker;

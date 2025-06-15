@@ -10,7 +10,7 @@ using Polly.CircuitBreaker;
 namespace Currency.IntegrationTests.Infrastructure.Integrations.Frankfurter;
 
 [TestFixture]
-[Category("Integration tests")]
+[Category("Integration")]
 public class FrankfurterClientTests
 {
     private HttpClient _client;

@@ -12,7 +12,7 @@ using Moq;
 
 namespace Currency.Services.Tests.Application;
 
-[Category("Unit tests")]
+[Category("Unit")]
 public class TokenServiceTests
 {
     private Mock<IAuthRepository> _mockAuthRepository;

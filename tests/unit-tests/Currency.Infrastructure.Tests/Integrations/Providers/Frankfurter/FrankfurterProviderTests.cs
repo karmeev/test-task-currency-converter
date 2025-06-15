@@ -7,7 +7,7 @@ using Moq;
 namespace Currency.Infrastructure.Tests.Integrations.Providers.Frankfurter;
 
 [TestFixture]
-[Category("Unit tests")]
+[Category("Unit")]
 public class FrankfurterProviderTests
 {
     private Mock<IFrankfurterClient> _client;

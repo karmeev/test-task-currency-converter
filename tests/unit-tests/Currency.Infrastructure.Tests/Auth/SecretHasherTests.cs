@@ -3,7 +3,7 @@ using Currency.Infrastructure.Tests.Utility;
 
 namespace Currency.Infrastructure.Tests.Auth;
 
-[Category("Unit tests")]
+[Category("Unit")]
 public class SecretHasherTests
 {
     [SetUp]

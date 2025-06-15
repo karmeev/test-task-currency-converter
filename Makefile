@@ -1,50 +1,45 @@
+UNIT_TESTS=./tests/unit-tests
+INTEGRATION_TESTS=./tests/integrations-tests
+TEST_PROJECTS := \
+    Currency.Api.Tests/Currency.Api.Tests.csproj \
+    Currency.Data.Tests/Currency.Data.Tests.csproj \
+    Currency.Facades.Tests/Currency.Facades.Tests.csproj \
+    Currency.Infrastructure.Tests/Currency.Infrastructure.Tests.csproj \
+    Currency.Services.Tests/Currency.Services.Tests.csproj \
+    Currency.IntegrationTests.Infrastructure/Currency.IntegrationTests.Infrastructure.csproj \
+
 local_infra:
 	docker network inspect currency_network >/dev/null 2>&1 || docker network create currency_network && \
 	docker compose -f docker-compose.infra.yaml up -d
 
-load_tests_in_compose:
-	docker compose -f ./tests/load/docker-compose.yaml up --build -d redis
-	docker compose -f ./tests/load/docker-compose.yaml up --build --exit-code-from redis-init redis-init
-	docker compose -f ./tests/load/docker-compose.yaml up --build api
-	@echo "Waiting 120 seconds for API to fully start..."
-	sleep 120
-	@echo "Start K6..."
-	docker compose -f ./tests/load/docker-compose.yaml up --build --abort-on-container-exit k6
-
-unit_tests:
-	dotnet test ./tests/unit-tests/Currency.Api.Tests/Currency.Api.Tests.csproj \
-				--configuration Release \
-                --no-restore \
-                --logger "console;verbosity=detailed"
-                
-	dotnet test ./tests/unit-tests/Currency.Data.Tests/Currency.Data.Tests.csproj \
-        		--configuration Release \
-        		--no-restore \
-        		--logger "console;verbosity=detailed"
-        		
-	dotnet test ./tests/unit-tests/Currency.Facades.Tests/Currency.Facades.Tests.csproj \
-        		--configuration Release \
-        		--no-restore \
-        		--logger "console;verbosity=detailed"
-        		
-	dotnet test ./tests/unit-tests/Currency.Infrastructure.Tests/Currency.Infrastructure.Tests.csproj \
-        		--configuration Release \
-        		--no-restore \
-        		--logger "console;verbosity=detailed"
-        		
-	dotnet test ./tests/unit-tests/Currency.Services.Tests/Currency.Services.Tests.csproj \
-        		--configuration Release \
-        		--no-restore \
-        		--logger "console;verbosity=detailed"
+test:
+	@if [ "$(CATEGORY)" = "Unit" ]; then \
+		TEST_PATH=$(UNIT_TESTS); \
+		PROJECTS="$(UNIT_TEST_PROJECTS)"; \
+	elif [ "$(CATEGORY)" = "Integration" ]; then \
+		TEST_PATH=$(INTEGRATION_TESTS); \
+		PROJECTS="$(INTEGRATION_TEST_PROJECTS)"; \
+	else \
+		echo "Unsupported CATEGORY '$(CATEGORY)'. Use 'Unit' or 'Integration'."; \
+		exit 1; \
+	fi; \
+	for proj in $$PROJECTS; do \
+		echo "Running $(CATEGORY) tests in $$proj..."; \
+		dotnet test $$TEST_PATH/$$proj \
+			--configuration Release \
+			--no-restore \
+			--logger "console;verbosity=detailed" \
+			--filter "Category=$(CATEGORY)"; \
+	done
 
 integration_tests:
-	dotnet test ./tests/integrations-tests/Currency.IntegrationTests.Infrastructure/Currency.IntegrationTests.Infrastructure.csproj \
+	dotnet test ${INTEGRATION_TESTS}/Currency.IntegrationTests.Infrastructure/Currency.IntegrationTests.Infrastructure.csproj \
 				--configuration Release \
                 --no-restore \
                 --logger "console;verbosity=detailed"
 		
 wiremock_up:
-	docker-compose -f ./tests/integrations-tests/Currency.IntegrationTests.Infrastructure/docker-compose.yaml up -d
+	docker-compose -f ${INTEGRATION_TESTS}/Currency.IntegrationTests.Infrastructure/docker-compose.yaml up -d
 	@echo "Waiting for WireMock to be ready..."
 	@for i in $$(seq 1 30); do \
 		curl -s http://localhost:8080/__admin && echo "WireMock ready!" && exit 0 || \
@@ -53,4 +48,4 @@ wiremock_up:
 	echo "WireMock failed to start in time" && exit 1
 
 wiremock_down:
-	docker-compose -f ./tests/integrations-tests/Currency.IntegrationTests.Infrastructure/docker-compose.yaml down
+	docker-compose -f ${INTEGRATION_TESTS}/Currency.IntegrationTests.Infrastructure/docker-compose.yaml down
