@@ -4,6 +4,7 @@ namespace Currency.Api.Settings;
 
 public class LoggerSettings
 {
+    public bool DisableLogger { get; set; }
     public string AppVersion { get; set; }
     public string Application { get; set; }
     public bool EnableDebugOptions { get; set; }

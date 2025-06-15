@@ -2,7 +2,7 @@ name: currency-converter
 services:
   api:
     build:
-      context: .
+      context: ./src
       dockerfile: ./Currency.Api/Dockerfile
     container_name: currency-converter-api
     image: currency-converter-api:latest

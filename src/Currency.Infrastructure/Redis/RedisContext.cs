@@ -29,13 +29,14 @@ internal class RedisContext(
         return value.HasValue ? JsonSerializer.Deserialize<T>(value!) : default;
     }
     
-    public async Task<T> GetByIndexAsync<T>(string index)
+    public async Task<T> TryGetByIndexAsync<T>(string index)
     {
         var db = GetIndexesDatabase();
         var value = await db.StringGetAsync(index);
         var key = value.ToString();
         db = GetDatabase(index);
         var entity = await db.StringGetAsync(key);
+        if (!entity.HasValue) return default;
         return JsonSerializer.Deserialize<T>(entity!);
     }
     

@@ -45,7 +45,7 @@ public class AuthFacadeTests
             Role = UserRole.User
         };
 
-        _userService.Setup(x => x.TryGetUserAsync(It.IsAny<LoginModel>(), It.IsAny<CancellationToken>())).ReturnsAsync(user);
+        _userService.Setup(x => x.GetUserAsync(It.IsAny<LoginModel>(), It.IsAny<CancellationToken>())).ReturnsAsync(user);
 
         _tokenService.Setup(x => x.GenerateTokens(It.IsAny<User>(), It.IsAny<CancellationToken>()))
             .Returns((FakeResults.GenerateFakeTokens(), new List<Claim>

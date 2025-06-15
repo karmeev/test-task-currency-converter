@@ -6,6 +6,6 @@ namespace Currency.Services.Contracts.Application;
 #nullable enable
 public interface IUserService
 {
-    Task<User?> TryGetUserAsync(LoginModel model, CancellationToken token);
+    Task<User> GetUserAsync(LoginModel model, CancellationToken token);
     Task<User?> TryGetUserByIdAsync(string userId, CancellationToken token);
 }

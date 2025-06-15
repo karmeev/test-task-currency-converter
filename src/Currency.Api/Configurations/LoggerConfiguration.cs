@@ -12,6 +12,8 @@ public static class CurrencyLoggerConfiguration
     {
         var loggerSettings = settings.LoggerSettings;
         
+        if (loggerSettings.DisableLogger) return;
+        
         if (loggerSettings.EnableDebugOptions)
         {
             Serilog.Debugging.SelfLog.Enable(msg =>

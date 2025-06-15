@@ -1,4 +1,5 @@
 using Currency.Data.Contracts;
+using Currency.Data.Contracts.Exceptions;
 using Currency.Domain.Login;
 using Currency.Domain.Users;
 using Currency.Infrastructure.Contracts.Databases.Base;
@@ -13,14 +14,18 @@ internal class UsersRepository(IRedisContext context) : IUsersRepository
     public async Task<User> GetUserByUsernameAsync(LoginModel model, CancellationToken token)
     {
         var index = $"{Prefix}:user-by-username:{model.Username}";
-        var user = await context.GetByIndexAsync<User>(index);
+        var user = await context.TryGetByIndexAsync<User>(index);
+        if (user is null)
+        {
+            return NotFoundException.Throw<User>($"User {model.Username} not found");
+        }
         return user;
     }
 
     public async Task<User> GetUserByIdAsync(string id, CancellationToken token)
     {
         var index = $"{Prefix}:user-by-id:{id}";
-        var user = await context.GetByIndexAsync<User>(index);
+        var user = await context.TryGetByIndexAsync<User>(index);
         return user;
     }
 }

@@ -65,7 +65,12 @@ public class ExceptionHandlerMiddleware
         {
             Error = ErrorMessage.InternalServerError,
             Message = "An unexpected error occurred while processing your request.",
-            Details = new { TraceId = requestId }
+            Details = new
+            {
+                TraceId = requestId,
+                Message = ex.Message,
+                StackTract = ex.StackTrace,
+            }
         });
     }
 }

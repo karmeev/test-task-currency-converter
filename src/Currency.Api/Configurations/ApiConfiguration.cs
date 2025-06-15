@@ -66,6 +66,8 @@ public static class ApiConfiguration
         loggerSettings.Environment = env;
         loggerSettings.EnableDebugOptions = configuration.GetSection($"{loggerSection}:EnableDebugOptions").
             Value?.ToLower() == "true";
+        loggerSettings.DisableLogger = configuration.GetSection($"{loggerSection}:DisableLogger").
+            Value?.ToLower() == "true";
 
         settings = new StartupSettings
         {

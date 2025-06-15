@@ -1,0 +1,17 @@
+name: Testing workflow
+
+on:
+  push:
+    branches: [ test ]
+  workflow_dispatch:
+
+jobs:
+  loadtest:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Run k6 in Docker Compose
+        run: make load_tests_in_compose

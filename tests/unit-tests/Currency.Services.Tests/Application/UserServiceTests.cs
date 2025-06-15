@@ -5,6 +5,7 @@ using Currency.Infrastructure.Contracts.Auth;
 using Currency.Services.Application;
 using Currency.Services.Tests.Fakes;
 using Currency.Services.Tests.Utility;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace Currency.Services.Tests.Application;
@@ -14,12 +15,14 @@ public class UserServiceTests
 {
     private Mock<ISecretHasher> _secretHasherMock;
     private Mock<IUsersRepository> _userRepositoryMock;
+    private ILogger<UserService> _logger;
 
     [SetUp]
     public void Setup()
     {
         _secretHasherMock = new Mock<ISecretHasher>();
         _userRepositoryMock = new Mock<IUsersRepository>();
+        _logger = Test.GetLogger<UserService>();
     }
 
     [Test]
@@ -37,10 +40,10 @@ public class UserServiceTests
         _userRepositoryMock.Setup(x => x.GetUserByUsernameAsync(It.IsAny<LoginModel>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(user);
 
-        var sut = new UserService(_secretHasherMock.Object, _userRepositoryMock.Object);
+        var sut = new UserService(_logger, _secretHasherMock.Object, _userRepositoryMock.Object);
 
         //Act
-        var result = await sut.TryGetUserAsync(model, CancellationToken.None);
+        var result = await sut.GetUserAsync(model, CancellationToken.None);
 
         //Assert
         if (result is not null)
@@ -68,7 +71,7 @@ public class UserServiceTests
         _userRepositoryMock.Setup(x => x.GetUserByIdAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(user);
 
-        var sut = new UserService(_secretHasherMock.Object, _userRepositoryMock.Object);
+        var sut = new UserService(_logger, _secretHasherMock.Object, _userRepositoryMock.Object);
 
         //Act
         var result = await sut.TryGetUserByIdAsync(id, CancellationToken.None);

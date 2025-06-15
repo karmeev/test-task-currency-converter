@@ -1,3 +1,4 @@
+using Currency.Data.Contracts.Exceptions;
 using Currency.Domain.Login;
 using Currency.Facades.Contracts;
 using Currency.Facades.Contracts.Requests;
@@ -21,14 +22,20 @@ internal class AuthFacade(
         if (!validationResult.IsValid) return AuthResponse.Error(validationResult.Message);
 
         var model = new LoginModel(request.Username, request.Password);
-        var user = await userService.TryGetUserAsync(model, ct);
-        if (user is null) return AuthResponse.Error("Incorrect credentials");
+        try
+        {
+            var user = await userService.GetUserAsync(model, ct);
+            
+            var (tokenModel, claims) = tokenService.GenerateTokens(user, ct);
+            await tokenService.AddRefreshTokenAsync(tokenModel.RefreshToken, user.Id, ct);
 
-        var (tokenModel, claims) = tokenService.GenerateTokens(user, ct);
-        await tokenService.AddRefreshTokenAsync(tokenModel.RefreshToken, user.Id, ct);
-
-        return new AuthResponse(claims, tokenModel.AccessToken, tokenModel.RefreshToken,
-            tokenModel.ExpiresAt);
+            return new AuthResponse(claims, tokenModel.AccessToken, tokenModel.RefreshToken,
+                tokenModel.ExpiresAt);
+        }
+        catch (NotFoundException)
+        {
+            return AuthResponse.Error("Incorrect credentials");
+        }
     }
 
     public async Task<AuthResponse> RefreshTokenAsync(string token, CancellationToken ct)

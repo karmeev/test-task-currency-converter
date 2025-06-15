@@ -40,6 +40,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Currency.Services", "Curren
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Currency.Services.Contracts", "Currency.Services.Contracts\Currency.Services.Contracts.csproj", "{8C19E7E9-07AA-48A0-93A5-FBC69FD57342}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LoadTests", "LoadTests", "{93020FAE-569D-442E-987A-AE920C835C20}"
+	ProjectSection(SolutionItems) = preProject
+		..\tests\load-tests\load-test.js = ..\tests\load-tests\load-test.js
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -124,5 +129,6 @@ Global
 		{BE46E860-70D3-49B7-A2E3-4918451BFBA4} = {B1FD9BD5-7D1A-4E44-B8BF-F349FD362008}
 		{4FF79212-7F53-4E08-B230-3CA1344D4ADB} = {B1FD9BD5-7D1A-4E44-B8BF-F349FD362008}
 		{840714BA-3DCE-4662-9B8A-4C4BF52C4585} = {B1FD9BD5-7D1A-4E44-B8BF-F349FD362008}
+		{93020FAE-569D-442E-987A-AE920C835C20} = {CAB45B09-3192-407E-AFAF-251C0CFE7313}
 	EndGlobalSection
 EndGlobal

@@ -7,11 +7,11 @@ namespace Currency.Api.Controllers;
 
 [ApiController]
 [ApiVersion("2.0")]
-[Authorize(Roles = nameof(UserRole.Admin))]
 [Route("api/v{version:apiVersion}/[controller]")]
 public class StatusController : ControllerBase
 {
     [HttpGet("health")]
+    [Authorize(Roles = nameof(UserRole.Admin))]
     public IActionResult GetStatus()
     {
         return Ok(new
@@ -20,5 +20,11 @@ public class StatusController : ControllerBase
             Version = "2.0",
             Status = "Healthy"
         });
+    }
+    
+    [HttpGet("ping")]
+    public IActionResult Ping()
+    {
+        return Ok();
     }
 }

@@ -1,0 +1,50 @@
+name: load-tests
+services:
+  api:
+    build:
+      context: ../../src
+      dockerfile: ./Currency.Api/test.Dockerfile
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    volumes:
+      - ./appsettings.Stage.json:/app/appsettings.json
+    environment:
+      - ASPNETCORE_URLS=http://0.0.0.0:8080
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/api/v2/status/ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
+  k6:
+    image: grafana/k6:latest
+    depends_on:
+      api:
+        condition: service_healthy
+    volumes:
+      - ./scripts:/k6-tests
+    command: run /k6-tests/load-test.js
+    
+  redis:
+    image: redis:latest
+    restart: always
+    ports:
+      - "6390:6379"
+
+  redis-init:
+    image: redis:7
+    depends_on:
+      - redis
+    entrypoint: /bin/sh
+    command:
+      - -c
+      - |
+        until redis-cli -h redis ping; do
+          echo 'Waiting for Redis...';
+          sleep 1;
+        done;
+        redis-cli -h redis < /data/init-redis.redis
+    volumes:
+      - ../../resources/scripts/init-redis.redis:/data/init-redis.redis
