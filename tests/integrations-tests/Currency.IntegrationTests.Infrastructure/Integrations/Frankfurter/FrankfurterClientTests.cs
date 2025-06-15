@@ -3,8 +3,10 @@ using Currency.Api.Settings;
 using Currency.Common.Providers;
 using Currency.Infrastructure.Integrations.Providers.Frankfurter;
 using Currency.Infrastructure.Settings;
+using Currency.IntegrationTests.Infrastructure.Utility;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Polly.CircuitBreaker;
 
 namespace Currency.IntegrationTests.Infrastructure.Integrations.Frankfurter;
@@ -13,6 +15,8 @@ namespace Currency.IntegrationTests.Infrastructure.Integrations.Frankfurter;
 [Category("Integration")]
 public class FrankfurterClientTests
 {
+    private ILogger<FrankfurterClient> _logger;
+    
     private HttpClient _client;
     private string WireMockAddress { get; set; }
     
@@ -41,6 +45,8 @@ public class FrankfurterClientTests
             }
         };
         
+        _logger = Test.GetLogger<FrankfurterClient>();
+        
         services.AddThirdPartyApis(settings);
         services.AddOptions();
         services.AddHttpClient();
@@ -64,7 +70,7 @@ public class FrankfurterClientTests
     public async Task GetLatestExchangeRateAsync_HappyPath_ReturnsLatestUsdRates()
     {
         //Arrange
-        var sut = new FrankfurterClient(_client, null);
+        var sut = new FrankfurterClient(_client, _logger);
 
         //Act
         var result = await sut.GetLatestExchangeRateAsync("USD", CancellationToken.None);
@@ -83,7 +89,7 @@ public class FrankfurterClientTests
     {
         //Arrange
         _client.BaseAddress = new Uri(WireMockAddress);
-        var sut = new FrankfurterClient(_client, null);
+        var sut = new FrankfurterClient(_client, _logger);
 
         //Act
         var result = await sut.GetLatestExchangeRateAsync("USD", CancellationToken.None);
@@ -102,7 +108,7 @@ public class FrankfurterClientTests
     {
         //Arrange
         _client.BaseAddress = new Uri(WireMockAddress);
-        var sut = new FrankfurterClient(_client, null);
+        var sut = new FrankfurterClient(_client, _logger);
 
         // Act
         for (var i = 0; i < 10; i++)
@@ -125,7 +131,7 @@ public class FrankfurterClientTests
     public async Task GetExchangeRatesHistoryAsync_HappyPath_ReturnsHistory()
     {
         //Arrange
-        var sut = new FrankfurterClient(_client, null);
+        var sut = new FrankfurterClient(_client, _logger);
         var startDate = DateOnly.FromDateTime(DateTime.UtcNow.Date.AddDays(-1));
         var endDate = DateOnly.FromDateTime(DateTime.UtcNow.Date);
 
@@ -149,7 +155,7 @@ public class FrankfurterClientTests
     public async Task GetLatestExchangeRatesAsync_HappyPath_ReturnsRates()
     {
         //Arrange
-        var sut = new FrankfurterClient(_client, null);
+        var sut = new FrankfurterClient(_client, _logger);
 
         //Act
         var result = await sut.GetLatestExchangeRatesAsync("EUR", ["USD"], 

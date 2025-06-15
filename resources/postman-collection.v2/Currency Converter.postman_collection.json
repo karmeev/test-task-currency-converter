@@ -1,0 +1,365 @@
+{
+	"info": {
+		"_postman_id": "39651934-1fb4-4b6c-8185-2d0885a6bf4f",
+		"name": "Currency Converter",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "42940499"
+	},
+	"item": [
+		{
+			"name": "v1",
+			"item": [
+				{
+					"name": "Auth",
+					"item": [
+						{
+							"name": "Login",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if (pm.response.code === 200) {",
+											"    try {",
+											"        const responseData = pm.response.json();",
+											"        if (responseData.accessToken) {",
+											"            pm.collectionVariables.set(\"token\", responseData.accessToken);",
+											"            pm.collectionVariables.set(\"refreshToken\", responseData.refreshToken)",
+											"            console.log(\"Access token saved to collection variable: token\");",
+											"        } else {",
+											"            console.log(\"No accessToken found in the response\");",
+											"        }",
+											"    } catch (e) {",
+											"        console.log(\"Error parsing response:\", e);",
+											"    }",
+											"} else {",
+											"    console.log(\"Request failed with status code:\", pm.response.code);",
+											"}"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"test-user\",\n    \"password\": \"my_test_password\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{url}}/api/v1/auth/login"
+							},
+							"response": []
+						},
+						{
+							"name": "Refresh Token",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if (pm.response.code === 200) {",
+											"    try {",
+											"        const responseData = pm.response.json();",
+											"        if (responseData.accessToken) {",
+											"            pm.collectionVariables.set(\"token\", responseData.accessToken);",
+											"            console.log(\"Access token saved to collection variable: token\");",
+											"        } else {",
+											"            console.log(\"No accessToken found in the response\");",
+											"        }",
+											"    } catch (e) {",
+											"        console.log(\"Error parsing response:\", e);",
+											"    }",
+											"} else {",
+											"    console.log(\"Request failed with status code:\", pm.response.code);",
+											"}"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"token\": \"{{refreshToken}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{url}}/api/v1/auth/refreshToken"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Currency",
+					"item": [
+						{
+							"name": "Retrieve Latest Exchange Rates",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/api/v1/currency/latest?base=USD",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"currency",
+										"latest"
+									],
+									"query": [
+										{
+											"key": "base",
+											"value": "USD",
+											"description": "(default) EUR"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Historical Exchange Rates",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/api/v1/currency?base=USD&startDate=2025-05-29&endDate=2025-05-30&page=1&size=5",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"currency"
+									],
+									"query": [
+										{
+											"key": "base",
+											"value": "USD",
+											"description": "(default) EUR"
+										},
+										{
+											"key": "startDate",
+											"value": "2025-05-29"
+										},
+										{
+											"key": "endDate",
+											"value": "2025-05-30"
+										},
+										{
+											"key": "page",
+											"value": "1",
+											"description": "(default) 1"
+										},
+										{
+											"key": "size",
+											"value": "5",
+											"description": "(default) 5"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Currency Conversion",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/api/v1/currency/convert?amount=10&from=USD&to=EUR",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"currency",
+										"convert"
+									],
+									"query": [
+										{
+											"key": "amount",
+											"value": "10"
+										},
+										{
+											"key": "from",
+											"value": "USD"
+										},
+										{
+											"key": "to",
+											"value": "EUR"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"auth": {
+						"type": "bearer",
+						"bearer": {
+							"token": "{{token}}"
+						}
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "v2",
+			"item": [
+				{
+					"name": "Status",
+					"item": [
+						{
+							"name": "Health",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": "{{url}}/api/v2/status/health"
+							},
+							"response": [
+								{
+									"name": "When resource requested without admin rights (RBAC)",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": "{{url}}/api/v2/status/health"
+									},
+									"status": "Forbidden",
+									"code": 403,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Date",
+											"value": "Fri, 13 Jun 2025 14:24:56 GMT"
+										},
+										{
+											"key": "Server",
+											"value": "Kestrel"
+										},
+										{
+											"key": "Transfer-Encoding",
+											"value": "chunked"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"error\": \"forbidden\",\n    \"message\": \"You do not have sufficient permissions to access this resource.\"\n}"
+								}
+							]
+						}
+					],
+					"auth": {
+						"type": "bearer",
+						"bearer": {
+							"token": "{{token}}"
+						}
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "url",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "refreshToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
