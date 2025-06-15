@@ -4,7 +4,7 @@ using Currency.Facades.Validators.Results;
 
 namespace Currency.Facades.Validators;
 
-public static class ExchangeRatesValidator
+internal static class ExchangeRatesValidator
 {
     public static ValidationResult ValidateRequest<T>(T request, out string[] errors)
     {
@@ -43,7 +43,7 @@ public static class ExchangeRatesValidator
             validationErrors.Add("The end date must be after or equal the start date.");
         }
         
-        if (request.EndDate > DateTime.UtcNow.Date)
+        if (request.EndDate > DateTime.UtcNow)
         {
             validationErrors.Add("The end date can not be in future.");
         }

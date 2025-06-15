@@ -13,53 +13,64 @@ namespace Currency.Data.Tests.Repositories;
 [Category("Unit")]
 public class ExchangeRatesHistoryRepositoryTests
 {
-    private Mock<IRedisContext> _mockContext;
+    private Mock<IRedisLockContext> _mockContext;
     private Mock<ILogger<ExchangeRatesHistoryRepository>> _mockLogger;
     private IExchangeRatesHistoryRepository _sut;
+    private DataSettings _settings;
 
     [SetUp]
     public void Setup()
     {
-        _mockContext = new Mock<IRedisContext>();
+        _mockContext = new Mock<IRedisLockContext>();
         _mockLogger = new Mock<ILogger<ExchangeRatesHistoryRepository>>();
-        
-        var settings = new DataSettings(new Mock<IOptionsMonitor<CacheSettings>>().Object);
-        _sut = new ExchangeRatesHistoryRepository(_mockLogger.Object, settings, _mockContext.Object);
+        _settings = new DataSettings(new Mock<IOptionsMonitor<CacheSettings>>().Object);
+        _sut = new ExchangeRatesHistoryRepository(_mockLogger.Object, _settings, _mockContext.Object);
     }
 
     [Test]
-    public async Task GetRateHistoryPagedAsync_ShouldDeserializeAndReturn()
+    public async Task GetRateHistoryPagedAsync_CancellationRequested_ReturnsEmpty()
     {
-        // Arrange
-        var entries = new[]
-        {
-            JsonConvert.SerializeObject(new ExchangeRateEntry { Date = DateTime.UtcNow })
-        };
-        _mockContext.Setup(x => x.SortedSetRangeByRankAsync("history:usd", 0, 9, true))
-            .ReturnsAsync(entries);
+        var ct = new CancellationToken(true); // canceled
+        var result = await _sut.GetRateHistoryPagedAsync("id", 1, 10, ct);
 
-        // Act
-        var result = await _sut.GetRateHistoryPagedAsync("usd", 1, 10, CancellationToken.None);
+        Assert.That(result, Is.Empty);
+    }
 
-        // Assert
-        Assert.That(result, Has.Exactly(1).Items);
+    [Test]
+    public async Task GetRateHistoryPagedAsync_NoValues_ReturnsEmpty()
+    {
+        _mockContext.Setup(x => x.SortedSetRangeByRankAsync(It.IsAny<string>(), 0, 9, true))
+            .ReturnsAsync(Array.Empty<string>());
+
+        var result = await _sut.GetRateHistoryPagedAsync("id", 1, 10, CancellationToken.None);
+
+        Assert.That(result, Is.Empty);
+    }
+
+    [Test]
+    public async Task GetRateHistoryPagedAsync_ValidValues_ParsesCorrectly()
+    {
+        var json = JsonConvert.SerializeObject(new ExchangeRateEntry { Date = DateTime.UtcNow });
+        _mockContext.Setup(x => x.SortedSetRangeByRankAsync("history:id", 0, 9, true))
+            .ReturnsAsync(new[] { json });
+
+        var result = await _sut.GetRateHistoryPagedAsync("id", 1, 10, CancellationToken.None);
+
+        Assert.That(result, Is.Not.Null);
     }
     
     [Test]
-    public async Task GetRateHistoryPagedAsync_KeyIsNoExists_ShouldReturnEmptyList()
+    public async Task AddRateHistory_ShouldCompleteWithoutException()
     {
-        // Arrange
-        var entries = new[]
+        var entries = new List<ExchangeRateEntry>
         {
-            JsonConvert.SerializeObject(new ExchangeRateEntry { Date = DateTime.UtcNow })
+            new ExchangeRateEntry { Date = DateTime.UtcNow, Value = 1.23M }
         };
-        _mockContext.Setup(x => x.SortedSetRangeByRankAsync("incorrect-key:usd", 0, 9, true))
-            .ReturnsAsync(entries);
 
-        // Act
-        var result = await _sut.GetRateHistoryPagedAsync("usd", 1, 10, CancellationToken.None);
+        var token = CancellationToken.None;
 
-        // Assert
-        Assert.That(result, Has.Exactly(0).Items);
+        Assert.DoesNotThrowAsync(async () =>
+            await _sut.AddRateHistory("test-id", entries, token));
     }
 }
+

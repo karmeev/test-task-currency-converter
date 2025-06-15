@@ -21,23 +21,30 @@ public class AuthRepositoryTests
     }
 
     [Test]
+    public async Task AddRefreshToken_CancellationRequested_ShouldNotCallSetAsync()
+    {
+        var token = new RefreshToken { Token = "token123", ExpiresAt = TimeSpan.FromMinutes(5) };
+        var ct = new CancellationToken(true); // canceled
+
+        await _sut.AddRefreshToken(token, ct);
+
+        _mockContext.Verify(x => x.SetAsync(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<TimeSpan>()), Times.Never);
+    }
+
+    [Test]
     public async Task AddRefreshToken_ShouldCallSetAsync()
     {
-        // Arrange
         var token = new RefreshToken { Token = "token123", ExpiresAt = TimeSpan.FromMinutes(5) };
 
-        // Act
         await _sut.AddRefreshToken(token, CancellationToken.None);
 
-        // Assert
         _mockContext.Verify(x =>
             x.SetAsync($"auth:{token.Token}", token, token.ExpiresAt), Times.Once);
     }
 
     [Test]
-    public async Task GetRefreshTokenAsync_TokenExists_ShouldReturnMappedToken()
+    public async Task GetRefreshTokenAsync_TokenExists_ReturnsMapped()
     {
-        // Arrange
         var model = new RefreshTokenModel
         {
             Verified = true,
@@ -46,13 +53,10 @@ public class AuthRepositoryTests
             UserId = "user-id"
         };
 
-        _mockContext.Setup(x => x.TryGetAsync<RefreshTokenModel>("auth:abc"))
-            .ReturnsAsync(model);
+        _mockContext.Setup(x => x.TryGetAsync<RefreshTokenModel>("auth:abc")).ReturnsAsync(model);
 
-        // Act
         var result = await _sut.GetRefreshTokenAsync("abc", CancellationToken.None);
 
-        // Assert
         Assert.Multiple(() =>
         {
             Assert.That(result.Token, Is.EqualTo("abc"));
@@ -60,4 +64,16 @@ public class AuthRepositoryTests
             Assert.That(result.UserId, Is.EqualTo("user-id"));
         });
     }
+
+    [Test]
+    public async Task GetRefreshTokenAsync_NotExists_ReturnsEmpty()
+    {
+        _mockContext.Setup(x => x.TryGetAsync<RefreshTokenModel>("auth:abc")).ReturnsAsync((RefreshTokenModel)null);
+
+        var result = await _sut.GetRefreshTokenAsync("abc", CancellationToken.None);
+
+        Assert.That(result.Verified, Is.False);
+        Assert.That(result.Token, Is.Null);
+    }
 }
+
