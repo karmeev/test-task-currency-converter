@@ -8,5 +8,5 @@ load_tests_in_compose:
 	docker compose -f ./tests/load/docker-compose.yaml up --build -d api
 	@echo "Waiting 60 seconds for API to fully start..."
 	sleep 60
-	docker exec load-tests-api-1 curl -sf http://localhost:8080/api/v2/status/ping || (echo "API not ready!" && exit 1)
+	@echo "Start K6..."
 	docker compose -f ./tests/load/docker-compose.yaml up --build --abort-on-container-exit k6
