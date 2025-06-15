@@ -1,11 +1,14 @@
 UNIT_TESTS=./tests/unit-tests
 INTEGRATION_TESTS=./tests/integrations-tests
-TEST_PROJECTS := \
+
+UNIT_TEST_PROJECTS := \
     Currency.Api.Tests/Currency.Api.Tests.csproj \
     Currency.Data.Tests/Currency.Data.Tests.csproj \
     Currency.Facades.Tests/Currency.Facades.Tests.csproj \
     Currency.Infrastructure.Tests/Currency.Infrastructure.Tests.csproj \
     Currency.Services.Tests/Currency.Services.Tests.csproj \
+
+INTEGRATION_TEST_PROJECTS := \
     Currency.IntegrationTests.Infrastructure/Currency.IntegrationTests.Infrastructure.csproj \
 
 local_infra:
