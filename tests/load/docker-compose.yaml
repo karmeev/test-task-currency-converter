@@ -47,8 +47,8 @@ services:
       test: [ "CMD", "curl", "-f", "http://localhost:8080/api/v2/status/ping" ]
       interval: 5s
       timeout: 3s
-      retries: 5
-      start_period: 5s
+      retries: 10
+      start_period: 15s
 
   k6:
     image: grafana/k6:latest
