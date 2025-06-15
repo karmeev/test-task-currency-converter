@@ -1,21 +1,28 @@
 using Currency.Api.Configurations;
 using Currency.Api.Settings;
 using Currency.Common.Providers;
-using Currency.Infrastructure.Contracts.Integrations;
 using Currency.Infrastructure.Integrations.Providers.Frankfurter;
 using Currency.Infrastructure.Settings;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Polly.CircuitBreaker;
 
-namespace Currency.IntegrationTests.Api.Infrastructure.Integrations.Frankfurter;
+namespace Currency.IntegrationTests.Infrastructure.Integrations.Frankfurter;
 
 [TestFixture]
 [Category("Integration tests")]
 public class FrankfurterClientTests
 {
+    private HttpClient _client;
+    private string WireMockAddress { get; set; }
+    
     [SetUp]
     public void Setup()
     {
+        var config = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json")
+            .Build();
+        
         var services = new ServiceCollection();
 
         var settings = new StartupSettings
@@ -24,7 +31,7 @@ public class FrankfurterClientTests
             {
                 Frankfurter = new FrankfurterSettings
                 {
-                    BaseAddress = "https://api.frankfurter.dev",
+                    BaseAddress = config.GetSection("FrankfurterUrl").Value,
                     TimeoutSeconds = 1,
                     RetryCount = 1,
                     RetryExponentialIntervalSeconds = 5,
@@ -43,6 +50,8 @@ public class FrankfurterClientTests
         var client = factory.CreateClient(ProvidersConst.Frankfurter);
 
         _client = client;
+        
+        WireMockAddress = config.GetSection("WireMockUrl").Value;
     }
 
     [TearDown]
@@ -50,9 +59,6 @@ public class FrankfurterClientTests
     {
         _client.Dispose();
     }
-
-    private HttpClient _client;
-    private const string WireMockAddress = "http://localhost:8085";
 
     [Test]
     public async Task GetLatestExchangeRateAsync_HappyPath_ReturnsLatestUsdRates()
@@ -146,7 +152,8 @@ public class FrankfurterClientTests
         var sut = new FrankfurterClient(_client, null);
 
         //Act
-        var result = await sut.GetLatestExchangeRatesAsync("EUR", ["USD"], CancellationToken.None);
+        var result = await sut.GetLatestExchangeRatesAsync("EUR", ["USD"], 
+            CancellationToken.None);
 
         //Assert
         Assert.Multiple(() =>

@@ -31,4 +31,11 @@
       <ProjectReference Include="..\..\..\src\Currency.Api\Currency.Api.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Remove="apssetings.json" />
+      <Content Include="appsettings.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
 </Project>

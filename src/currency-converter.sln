@@ -6,7 +6,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTests", "UnitTests", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IntegrationTests", "IntegrationTests", "{6EF5AF5C-4EA7-4F10-B981-30D816307430}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Currency.IntegrationTests.Api", "..\tests\integrations-tests\Currency.IntegrationTests.Api\Currency.IntegrationTests.Api.csproj", "{1809F026-892F-489B-95E5-85E1ED1A5B8E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Currency.IntegrationTests.Infrastructure", "..\tests\integrations-tests\Currency.IntegrationTests.Infrastructure\Currency.IntegrationTests.Infrastructure.csproj", "{1809F026-892F-489B-95E5-85E1ED1A5B8E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Currency.Api.Tests", "..\tests\unit-tests\Currency.Api.Tests\Currency.Api.Tests.csproj", "{A92CE58A-C7B8-4E49-9A50-0466E893AE1D}"
 EndProject
@@ -39,11 +39,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Currency.Services", "Currency.Services\Currency.Services.csproj", "{49AFA542-8E67-4040-A7D4-E28FA3A52437}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Currency.Services.Contracts", "Currency.Services.Contracts\Currency.Services.Contracts.csproj", "{8C19E7E9-07AA-48A0-93A5-FBC69FD57342}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LoadTests", "LoadTests", "{93020FAE-569D-442E-987A-AE920C835C20}"
-	ProjectSection(SolutionItems) = preProject
-		..\tests\load-tests\load-test.js = ..\tests\load-tests\load-test.js
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -129,6 +124,5 @@ Global
 		{BE46E860-70D3-49B7-A2E3-4918451BFBA4} = {B1FD9BD5-7D1A-4E44-B8BF-F349FD362008}
 		{4FF79212-7F53-4E08-B230-3CA1344D4ADB} = {B1FD9BD5-7D1A-4E44-B8BF-F349FD362008}
 		{840714BA-3DCE-4662-9B8A-4C4BF52C4585} = {B1FD9BD5-7D1A-4E44-B8BF-F349FD362008}
-		{93020FAE-569D-442E-987A-AE920C835C20} = {CAB45B09-3192-407E-AFAF-251C0CFE7313}
 	EndGlobalSection
 EndGlobal

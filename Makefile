@@ -36,3 +36,21 @@ unit_tests:
         		--configuration Release \
         		--no-restore \
         		--logger "console;verbosity=detailed"
+
+integration_tests:
+	dotnet test ./tests/integrations-tests/Currency.IntegrationTests.Infrastructure/Currency.IntegrationTests.Infrastructure.csproj \
+				--configuration Release \
+                --no-restore \
+                --logger "console;verbosity=detailed"
+		
+wiremock_up:
+	docker-compose -f ./tests/integrations-tests/Currency.IntegrationTests.Infrastructure/docker-compose.yaml up -d
+	@echo "Waiting for WireMock to be ready..."
+	@for i in $$(seq 1 30); do \
+		curl -s http://localhost:8080/__admin && echo "WireMock ready!" && exit 0 || \
+		(echo "Waiting for WireMock..." && sleep 2); \
+	done; \
+	echo "WireMock failed to start in time" && exit 1
+
+wiremock_down:
+	docker-compose -f ./tests/integrations-tests/Currency.IntegrationTests.Infrastructure/docker-compose.yaml down
