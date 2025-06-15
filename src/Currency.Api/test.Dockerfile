@@ -6,8 +6,8 @@ RUN apt-get update && apt-get install -y curl
 
 # Create a non-root user and switch to it for better security
 ARG APP_UID=1000
-RUN useradd -m -u $APP_UID appuser
-USER appuser
+#RUN useradd -m -u $APP_UID appuser
+#USER appuser
 
 WORKDIR /app
 

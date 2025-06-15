@@ -38,6 +38,7 @@ services:
     depends_on:
       - redis
     entrypoint: /bin/sh
+    restart: "no"
     command:
       - -c
       - |
